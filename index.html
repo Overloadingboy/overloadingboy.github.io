@@ -3,33 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberTic Evolution</title>
+    
     <meta name="google-adsense-account" content="ca-pub-2021454167052270">
     <meta name="google-site-verification" content="8Zrguc3EHXMbYg20P7UwIGef2ZH6ZlMLqM8OLIOiW3Y" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2021454167052270"
-     crossorigin="anonymous"></script>
-    <title>Pro Tic Tac Toe - AI Levels</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2021454167052270" crossorigin="anonymous"></script>
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #121212; color: white; }
-        h1 { margin-top: 20px; color: #00d4ff; }
-        .controls { margin: 20px; text-align: center; background: #1e1e1e; padding: 15px; border-radius: 10px; }
-        .board { display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 10px; margin-top: 20px; }
-        .cell { width: 100px; height: 100px; background-color: #2a2a2a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .cell:hover { background-color: #383838; }
-        .cell.taken { cursor: not-allowed; }
-        .status { margin-top: 20px; font-size: 1.2rem; height: 30px; }
-        button { padding: 10px 20px; font-size: 1rem; cursor: pointer; background-color: #00d4ff; border: none; border-radius: 5px; color: black; font-weight: bold; margin-top: 20px; }
-        input[type=range] { width: 200px; cursor: pointer; }
+        :root {
+            --bg: #0a0a12;
+            --card: #161625;
+            --accent: #00f2ff; /* Cyan Neon */
+            --player-x: #ff007b; /* Pink Neon */
+            --player-o: #00f2ff; 
+            --text: #ffffff;
+            --xp-bar: #39ff14; /* Matrix Green */
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* NEON GLOW HEADER */
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+            margin: 10px 0;
+        }
+
+        /* ADDICTIVE PROGRESS BAR */
+        .xp-container {
+            width: 300px;
+            height: 10px;
+            background: #222;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        .xp-fill {
+            height: 100%;
+            width: 1%;
+            background: linear-gradient(90deg, var(--xp-bar), var(--accent));
+            box-shadow: 0 0 10px var(--xp-bar);
+            transition: width 0.5s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .val { display: block; font-size: 1.5rem; font-weight: bold; color: var(--accent); }
+        .lbl { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+
+        /* THE BOARD */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 12px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background: var(--card);
+            border: 2px solid #222;
+            border-radius: 15px;
+            font-size: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .cell:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .cell.x { color: var(--player-x); text-shadow: 0 0 15px var(--player-x); }
+        .cell.o { color: var(--player-o); text-shadow: 0 0 15px var(--player-o); }
+
+        /* WINNING ANIMATION */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: brightness(1.5); }
+            100% { transform: scale(1); }
+        }
+        .winner-cell { animation: pulse 0.6s infinite; border-color: var(--xp-bar) !important; }
+
+        button {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        #status { height: 20px; margin-bottom: 10px; font-weight: bold; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-    <h1>Tic Tac Toe AI</h1>
-
-    <div class="controls">
-        <label>Difficulty: Level <span id="levelDisplay">50</span></label><br>
-        <input type="range" id="levelSlider" min="1" max="100" value="50" oninput="updateLevel(this.value)">
-        <p style="font-size: 0.8rem; color: #888;">Level 100 is Unbeatable</p>
+    <h1>Level <span id="levelNum">1</span></h1>
+    
+    <div class="xp-container">
+        <div class="xp-fill" id="xpBar"></div>
     </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><span class="lbl">Wins</span><span class="val" id="scoreX">0</span></div>
+        <div class="stat-card"><span class="lbl">CPU</span><span class="val" id="scoreO">0</span></div>
+        <div class="stat-card"><span class="lbl">Diff</span><span class="val" id="diffPerc">1%</span></div>
+    </div>
+
+    <div id="status">INITIALIZING...</div>
 
     <div class="board" id="board">
         <div class="cell" onclick="makeMove(0)"></div>
@@ -43,143 +165,134 @@
         <div class="cell" onclick="makeMove(8)"></div>
     </div>
 
-    <div class="status" id="status">Your turn (X)</div>
-    <button onclick="resetGame()">Reset Game</button>
+    <button onclick="resetGame()">Next Round</button>
 
     <script>
-        let board = ['', '', '', '', '', '', '', '', ''];
+        let board = Array(9).fill("");
         let gameActive = true;
-        let difficulty = 50;
-        const player = 'X';
-        const ai = 'O';
+        let level = parseInt(localStorage.getItem('ttt_lvl')) || 1;
+        let wins = parseInt(localStorage.getItem('ttt_wins')) || 0;
+        let cpuWins = parseInt(localStorage.getItem('ttt_losses')) || 0;
 
-        const scores = { 'X': -10, 'O': 10, 'tie': 0 };
+        const cells = document.querySelectorAll(".cell");
+        const statusTxt = document.getElementById("status");
 
-        function updateLevel(val) {
-            difficulty = val;
-            document.getElementById('levelDisplay').innerText = val;
+        // Sync UI
+        function updateUI() {
+            document.getElementById("levelNum").innerText = level;
+            document.getElementById("scoreX").innerText = wins;
+            document.getElementById("scoreO").innerText = cpuWins;
+            document.getElementById("xpBar").style.width = level + "%";
+            document.getElementById("diffPerc").innerText = level + "%";
+            statusTxt.innerText = "YOUR TURN";
+        }
+        updateUI();
+
+        function makeMove(i) {
+            if (board[i] !== "" || !gameActive) return;
+            board[i] = "X";
+            cells[i].innerText = "X";
+            cells[i].classList.add("x");
+            if (checkWin("X")) return;
+            
+            statusTxt.innerText = "CPU THINKING...";
+            gameActive = false; 
+            setTimeout(cpuMove, 500);
         }
 
-        function makeMove(index) {
-            if (board[index] === '' && gameActive) {
-                board[index] = player;
-                updateBoard();
-                if (!checkGameOver()) {
-                    document.getElementById('status').innerText = "AI is thinking...";
-                    setTimeout(aiMove, 500);
-                }
-            }
-        }
-
-        function aiMove() {
-            if (!gameActive) return;
-
+        function cpuMove() {
             let move;
-            let rand = Math.random() * 100;
-
-            if (rand < difficulty) {
-                // Use Minimax for "Smart" move
-                move = getBestMove();
+            // Level-based difficulty
+            if (Math.random() < (level / 100)) {
+                move = getBestMove(); // Impossible logic
             } else {
-                // Use Random for "Mistake"
-                let available = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
-                move = available[Math.floor(Math.random() * available.length)];
+                let avail = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+                move = avail[Math.floor(Math.random() * avail.length)];
             }
 
-            board[move] = ai;
-            updateBoard();
-            checkGameOver();
-            if (gameActive) document.getElementById('status').innerText = "Your turn (X)";
-        }
-
-        function getBestMove() {
-            let bestScore = -Infinity;
-            let move;
-            for (let i = 0; i < 9; i++) {
-                if (board[i] === '') {
-                    board[i] = ai;
-                    let score = minimax(board, 0, false);
-                    board[i] = '';
-                    if (score > bestScore) {
-                        bestScore = score;
-                        move = i;
-                    }
+            if (move !== undefined) {
+                board[move] = "O";
+                cells[move].innerText = "O";
+                cells[move].classList.add("o");
+                if (!checkWin("O")) {
+                    gameActive = true;
+                    statusTxt.innerText = "YOUR TURN";
                 }
             }
-            return move;
         }
 
-        function minimax(board, depth, isMaximizing) {
-            let result = checkWinnerRaw();
-            if (result !== null) return scores[result];
-
-            if (isMaximizing) {
-                let bestScore = -Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (board[i] === '') {
-                        board[i] = ai;
-                        let score = minimax(board, depth + 1, false);
-                        board[i] = '';
-                        bestScore = Math.max(score, bestScore);
-                    }
-                }
-                return bestScore;
-            } else {
-                let bestScore = Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (board[i] === '') {
-                        board[i] = player;
-                        let score = minimax(board, depth + 1, true);
-                        board[i] = '';
-                        bestScore = Math.min(score, bestScore);
-                    }
-                }
-                return bestScore;
-            }
-        }
-
-        function checkWinnerRaw() {
-            const winPatterns = [
-                [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]
-            ];
-            for (let p of winPatterns) {
-                if (board[p[0]] && board[p[0]] === board[p[1]] && board[p[0]] === board[p[2]]) return board[p[0]];
-            }
-            if (!board.includes('')) return 'tie';
-            return null;
-        }
-
-        function checkGameOver() {
-            let result = checkWinnerRaw();
-            if (result) {
-                gameActive = false;
-                if (result === 'tie') {
-                    document.getElementById('status').innerText = "It's a Tie!";
+        function checkWin(p) {
+            const wins_patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            let match = wins_patterns.find(ptrn => ptrn.every(i => board[i] === p));
+            
+            if (match) {
+                statusTxt.innerText = p === "X" ? "LEVEL CLEARED!" : "SYSTEM FAILURE";
+                if (p === "X") {
+                    level++; wins++;
+                    localStorage.setItem('ttt_lvl', level);
+                    localStorage.setItem('ttt_wins', wins);
                 } else {
-                    document.getElementById('status').innerText = result === 'X' ? "You Won!" : "AI Won!";
+                    cpuWins++;
+                    localStorage.setItem('ttt_losses', cpuWins);
                 }
+                match.forEach(idx => cells[idx].classList.add("winner-cell"));
+                updateUI();
+                gameActive = false;
+                return true;
+            }
+            if (!board.includes("")) {
+                statusTxt.innerText = "DRAW - SYSTEM REBOOT";
+                gameActive = false;
                 return true;
             }
             return false;
         }
 
-        function updateBoard() {
-            const cells = document.getElementsByClassName('cell');
+        function resetGame() {
+            board = Array(9).fill("");
+            gameActive = true;
+            cells.forEach(c => {
+                c.innerText = "";
+                c.className = "cell";
+            });
+            updateUI();
+        }
+
+        // MINIMAX AI (Standard Smart Logic)
+        function getBestMove() {
+            let bestScore = -Infinity;
+            let move;
             for (let i = 0; i < 9; i++) {
-                cells[i].innerText = board[i];
-                if (board[i] !== '') cells[i].classList.add('taken');
+                if (board[i] === "") {
+                    board[i] = "O";
+                    let score = minimax(board, 0, false);
+                    board[i] = "";
+                    if (score > bestScore) { bestScore = score; move = i; }
+                }
+            }
+            return move;
+        }
+
+        function minimax(b, d, isMax) {
+            let res = evalBoard(b);
+            if (res !== null) return res;
+            if (isMax) {
+                let s = -Infinity;
+                for (let i=0; i<9; i++) { if(b[i]==="") { b[i]="O"; s=Math.max(s, minimax(b, d+1, false)); b[i]=""; } }
+                return s;
+            } else {
+                let s = Infinity;
+                for (let i=0; i<9; i++) { if(b[i]==="") { b[i]="X"; s=Math.min(s, minimax(b, d+1, true)); b[i]=""; } }
+                return s;
             }
         }
 
-        function resetGame() {
-            board = ['', '', '', '', '', '', '', '', ''];
-            gameActive = true;
-            document.getElementById('status').innerText = "Your turn (X)";
-            const cells = document.getElementsByClassName('cell');
-            for (let cell of cells) {
-                cell.innerText = '';
-                cell.classList.remove('taken');
+        function evalBoard(b) {
+            const wins_patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (let p of wins_patterns) {
+                if (b[p[0]] && b[p[0]] === b[p[1]] && b[p[0]] === b[p[2]]) return b[p[0]] === "O" ? 10 : -10;
             }
+            return b.includes("") ? null : 0;
         }
     </script>
 </body>
