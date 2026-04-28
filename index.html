@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberTic Evolution | Strategy & Logic Game</title>
     
     <meta name="google-adsense-account" content="ca-pub-2021454167052270">
     <meta name="google-site-verification" content="8Zrguc3EHXMbYg20P7UwIGef2ZH6ZlMLqM8OLIOiW3Y" />
@@ -65,7 +64,7 @@
                 <button class="nav-btn" onclick="changeLevel(1)" id="nextBtn">▸</button>
             </div>
             
-            <p id="status" style="margin-bottom: 20px; font-weight: bold;">Level 1: Beginner Challenge</p>
+            <p id="status" style="margin-bottom: 20px; font-weight: bold;">Level 1</p>
 
             <div class="board" id="board">
                 <div class="cell" onclick="play(0)"></div><div class="cell" onclick="play(1)"></div><div class="cell" onclick="play(2)"></div>
@@ -116,21 +115,24 @@
 
     // GAME LOGIC
     let board = Array(9).fill("");
-    let maxLvl = parseInt(localStorage.getItem('max_lvl')) || 1;
-    let curLvl = maxLvl;
+    // Allow any level to be selected. Load previous level if exists, else start at 1.
+    let curLvl = parseInt(localStorage.getItem('cur_lvl')) || 1;
     let active = true;
 
     const cells = document.querySelectorAll('.cell');
 
     function updateUI() {
         document.getElementById('levelNum').innerText = curLvl;
+        document.getElementById('status').innerText = `Level ${curLvl}`;
+        // Unlocked navigation for all levels up to 100
         document.getElementById('prevBtn').disabled = (curLvl <= 1);
-        document.getElementById('nextBtn').disabled = (curLvl >= maxLvl);
+        document.getElementById('nextBtn').disabled = (curLvl >= 100);
+        localStorage.setItem('cur_lvl', curLvl);
     }
     updateUI();
 
     function changeLevel(d) {
-        if (curLvl + d >= 1 && curLvl + d <= maxLvl) {
+        if (curLvl + d >= 1 && curLvl + d <= 100) {
             curLvl += d;
             resetBoard();
             updateUI();
@@ -153,12 +155,18 @@
         if (avail.length === 0) return;
 
         let move;
-        // AI Difficulty logic
-        if (Math.random() < (curLvl / 100)) {
+        // AI Strictness increases as levels increase
+        let aiStrictness = curLvl / 100;
+        
+        if (Math.random() < aiStrictness) {
             move = getBestMove(); 
         } else {
+            // Random move if AI "fails" the strictness check
             move = avail[Math.floor(Math.random() * avail.length)];
         }
+
+        // Failsafe in case getBestMove returns undefined (board full)
+        if (move === undefined) move = avail[0];
 
         board[move] = "O";
         cells[move].innerText = "O";
@@ -170,29 +178,71 @@
     function checkWin(p) {
         const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
         let match = wins.find(a => a.every(i => board[i] === p));
+        
         if (match) {
-            if (p === "X" && curLvl === maxLvl) {
-                maxLvl++;
-                localStorage.setItem('max_lvl', maxLvl);
+            if (p === "X") {
+                alert("Level Clear!");
+                // Auto-progress to next level on win
+                if (curLvl < 100) {
+                    curLvl++;
+                }
+            } else {
+                alert("AI Wins! Try again.");
             }
-            alert(p === "X" ? "Level Clear!" : "AI Wins!");
             resetBoard();
             updateUI();
             return true;
         }
-        if (!board.includes("")) { alert("Draw!"); resetBoard(); return true; }
+        if (!board.includes("")) { 
+            alert("Draw!"); 
+            resetBoard(); 
+            return true; 
+        }
         return false;
     }
 
     function resetBoard() {
         board = Array(9).fill("");
         active = true;
-        cells.forEach(c => { c.innerText = ""; c.className = "cell"; });
+        cells.forEach(c => { c.innerText = ""; c.className = "cell"; c.classList.remove("x", "o"); });
     }
 
-    // Minimax simplified
+    // Advanced, slightly unpredictable logic that scales in difficulty
     function getBestMove() {
-        for (let i of [4, 0, 2, 6, 8, 1, 3, 5, 7]) { if (board[i] === "") return i; }
+        // 1. Check if AI can win
+        let winMove = findWinningMove("O");
+        if (winMove !== -1) return winMove;
+        
+        // 2. Check if AI needs to block the player
+        let blockMove = findWinningMove("X");
+        if (blockMove !== -1) return blockMove;
+
+        // 3. Take the center if available
+        if (board[4] === "") return 4;
+
+        // 4. Take a random available corner (adds unpredictability)
+        let corners = [0, 2, 6, 8].filter(i => board[i] === "");
+        if (corners.length > 0) return corners[Math.floor(Math.random() * corners.length)];
+
+        // 5. Take a random available edge
+        let edges = [1, 3, 5, 7].filter(i => board[i] === "");
+        if (edges.length > 0) return edges[Math.floor(Math.random() * edges.length)];
+    }
+
+    // Helper function to detect immediate wins/blocks
+    function findWinningMove(player) {
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        for (let combo of wins) {
+            let count = 0;
+            let emptySquare = -1;
+            for (let i of combo) {
+                if (board[i] === player) count++;
+                else if (board[i] === "") emptySquare = i;
+            }
+            // If two are filled by the same player and one is empty, it's a win/block opportunity
+            if (count === 2 && emptySquare !== -1) return emptySquare;
+        }
+        return -1;
     }
 </script>
 
