@@ -7,64 +7,201 @@
     <meta name="google-adsense-account" content="ca-pub-2021454167052270">
     <meta name="google-site-verification" content="8Zrguc3EHXMbYg20P7UwIGef2ZH6ZlMLqM8OLIOiW3Y" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2021454167052270" crossorigin="anonymous"></script>
+    
     <title>CyberTic Evolution | Level 1-100 Strategy Game</title>
-    <meta name="description" content="Master 100 levels of strategy in CyberTic Evolution. A professional logic game hosted at overloadingboy.github.io.">
+    <meta name="description" content="Master 100 levels of strategy. Featuring an unbeatable Minimax AI at Impossible Levels 90-100.">
     <link rel="canonical" href="https://overloadingboy.github.io/" />
 
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #0ea5e9; --text: #f8fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
-        
-        /* ADSENSE-FRIENDLY NAV */
-        nav { background: #000; padding: 1rem; display: flex; justify-content: center; gap: 20px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent); }
-        nav a { color: white; text-decoration: none; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
-        nav a:hover { color: var(--accent); }
+        :root { 
+            --bg: #020617; 
+            --card: #1e293b; 
+            --accent: #0ea5e9; 
+            --text: #f8fafc; 
+            --x-color: #f43f5e;
+            --o-color: #0ea5e9;
+            
+            /* Difficulty Colors */
+            --easy: #22c55e;
+            --normal: #eab308;
+            --difficult: #f97316;
+            --impossible: #ef4444;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            overflow-x: hidden;
+        }
+
+        /* NAVIGATION */
+        nav { 
+            background: rgba(0, 0, 0, 0.8); 
+            padding: 1rem; 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 2px solid var(--accent);
+            backdrop-filter: blur(10px);
+        }
+        nav a { color: white; text-decoration: none; font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
+        nav a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
 
         .container { max-width: 900px; margin: auto; padding: 20px; }
-        
-        /* GAME UI */
-        .game-area { display: flex; flex-direction: column; align-items: center; background: var(--card); padding: 30px; border-radius: 20px; margin: 20px 0; border: 1px solid #334155; }
-        .level-picker { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; }
-        .nav-btn { background: var(--accent); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-        .nav-btn:disabled { background: #475569; cursor: not-allowed; }
 
-        .board { display: grid; grid-template-columns: repeat(3, 90px); gap: 10px; }
-        .cell { width: 90px; height: 90px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer; border: 1px solid #334155; transition: 0.2s; }
-        .cell:hover { border-color: var(--accent); }
-        .x { color: #f43f5e; text-shadow: 0 0 10px #f43f5e; }
-        .o { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        /* GAME AREA & ANIMATIONS */
+        .game-area { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: var(--card); 
+            padding: 40px 20px; 
+            border-radius: 24px; 
+            margin: 20px 0; 
+            border: 1px solid #334155;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* LEVEL SELECTION DROPDOWN */
+        .level-picker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .custom-select {
+            background: #0f172a;
+            color: var(--text);
+            border: 2px solid var(--accent);
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            outline: none;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            appearance: none; /* Removes default OS styling for a custom look */
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+            transition: 0.3s;
+        }
+        .custom-select:hover { border-color: #38bdf8; box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); }
+        .custom-select optgroup { background: var(--card); color: var(--accent); font-style: normal; font-weight: bold; }
+        .custom-select option { background: #0f172a; color: white; font-weight: normal; }
+
+        /* DIFFICULTY BADGE */
+        .difficulty-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px currentColor;
+            transition: all 0.3s ease;
+        }
+
+        /* STATUS MESSAGE */
+        #status { font-size: 1.2rem; min-height: 1.5em; margin-bottom: 20px; font-weight: bold; text-align: center; }
+
+        /* THE BOARD */
+        .board { 
+            display: grid; 
+            grid-template-columns: repeat(3, 100px); 
+            gap: 15px; 
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.1);
+        }
+
+        .cell { 
+            width: 100px; 
+            height: 100px; 
+            background: #1e293b; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 3rem; 
+            cursor: pointer; 
+            border: 1px solid #334155; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .cell:hover { background: #334155; border-color: var(--accent); transform: scale(1.02); }
+        
+        .cell.x { color: var(--x-color); text-shadow: 0 0 15px var(--x-color); animation: pop 0.3s ease-out; }
+        .cell.o { color: var(--o-color); text-shadow: 0 0 15px var(--o-color); animation: pop 0.3s ease-out; }
+
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         /* CONTENT SECTIONS */
-        .page { display: none; padding: 20px; background: var(--card); border-radius: 15px; margin-top: 20px; }
-        .active { display: block; }
-        
+        .page { display: none; padding: 30px; background: var(--card); border-radius: 15px; margin-top: 20px; line-height: 1.8; }
+        .active { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         footer { text-align: center; padding: 40px; color: #64748b; font-size: 0.8rem; border-top: 1px solid #334155; margin-top: 50px; }
-        h2 { color: var(--accent); border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        h2 { color: var(--accent); }
+
+        button.reset { 
+            margin-top: 30px; 
+            background: transparent; 
+            border: 2px solid var(--accent); 
+            color: var(--accent); 
+            padding: 10px 25px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button.reset:hover { background: var(--accent); color: white; }
+
+        @media (max-width: 400px) {
+            .board { grid-template-columns: repeat(3, 80px); gap: 10px; }
+            .cell { width: 80px; height: 80px; font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
 
 <nav>
-    <a onclick="showPage('game')">PLAY GAME</a>
-    <a onclick="showPage('guide')">STRATEGY GUIDE</a>
-    <a onclick="showPage('privacy')">PRIVACY</a>
-    <a onclick="showPage('about')">ABOUT</a>
+    <a onclick="showPage('game')">CYBER PLAY</a>
+    <a onclick="showPage('guide')">CORE LOGIC</a>
+    <a onclick="showPage('privacy')">ENCRYPTION</a>
 </nav>
 
 <div class="container">
-    
     <div id="game" class="page active">
         <div class="game-area">
+            
             <div class="level-picker">
-                <button class="nav-btn" onclick="changeLevel(-1)" id="prevBtn">◂</button>
-                <div style="text-align: center;">
-                    <span style="font-size: 0.7rem; color: var(--accent); display: block;">DIFFICULTY</span>
-                    <span id="levelNum" style="font-size: 2rem; font-weight: bold;">1</span>
-                </div>
-                <button class="nav-btn" onclick="changeLevel(1)" id="nextBtn">▸</button>
+                <span id="diffBadge" class="difficulty-badge">EASY</span>
+                <select id="levelSelect" class="custom-select" onchange="changeLevel(this.value)">
+                    </select>
             </div>
             
-            <p id="status" style="margin-bottom: 20px; font-weight: bold;">Level 1</p>
+            <p id="status">System Ready.</p>
 
             <div class="board" id="board">
                 <div class="cell" onclick="play(0)"></div><div class="cell" onclick="play(1)"></div><div class="cell" onclick="play(2)"></div>
@@ -72,131 +209,242 @@
                 <div class="cell" onclick="play(6)"></div><div class="cell" onclick="play(7)"></div><div class="cell" onclick="play(8)"></div>
             </div>
             
-            <button onclick="resetBoard()" style="margin-top: 30px; background: none; border: 1px solid white; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Reset Board</button>
+            <button class="reset" onclick="resetBoard()">REBOOT BOARD</button>
         </div>
     </div>
 
     <div id="guide" class="page">
-        <h2>How to Master CyberTic Evolution</h2>
-        <p>This game isn't just about X's and O's; it's about pattern recognition and predictive logic. As you move from Level 1 to Level 100, the AI shifts from random placements to a perfect Minimax algorithm.</p>
-        <h3>Winning Strategies:</h3>
+        <h2>Threat Level Protocols</h2>
         <ul>
-            <li><strong>The Corner Opening:</strong> Statistically, starting in a corner gives you the highest number of ways to win.</li>
-            <li><strong>The Fork:</strong> Create two ways to win at the same time. This forces the AI to choose one, letting you win with the other.</li>
-            <li><strong>Defense First:</strong> At higher levels (Level 50+), the AI will block you instantly. You must play for a draw to survive.</li>
+            <li><strong style="color: var(--easy)">Easy (1-30):</strong> The AI is learning. Expect random moves and missed opportunities.</li>
+            <li><strong style="color: var(--normal)">Normal (31-60):</strong> The AI recognizes basic threats and will attempt to block immediate wins.</li>
+            <li><strong style="color: var(--difficult)">Difficult (61-89):</strong> High probability of optimal moves. Mistakes are rare.</li>
+            <li><strong style="color: var(--impossible)">Impossible (90-100):</strong> The Minimax Algorithm engages. The AI sees every possible future. You can only draw or lose.</li>
         </ul>
     </div>
 
     <div id="privacy" class="page">
-        <h2>Privacy Policy</h2>
-        <p>At CyberTic, we prioritize user privacy. We do not collect, store, or share any personal information. All game data, including levels reached and scores, are stored locally on your device via browser LocalStorage. This data never leaves your computer.</p>
-        <p>We use Google AdSense to serve advertisements. Google may use cookies to personalize ads based on your interests.</p>
+        <h2>Privacy & Cookies</h2>
+        <p>Data is stored locally using <code>localStorage</code>. No telemetry or personal data is transmitted to our servers.</p>
     </div>
-
-    <div id="about" class="page">
-        <h2>About the Project</h2>
-        <p>CyberTic Evolution was developed as an educational tool to demonstrate AI scaling in simple games. This project is hosted on GitHub Pages and is free for everyone to use.</p>
-        <p>Contact: overloadingboy@github.io</p>
-    </div>
-
 </div>
 
 <footer>
-    &copy; 2026 CyberTic Strategy Games. All Rights Reserved.<br>
-    Hosted on GitHub | Powered by Strategy Logic AI
+    &copy; 2026 CyberTic Strategy Games. Powered by Minimax Logic.
 </footer>
 
 <script>
-    // PAGE TOGGLE
+    // GAME STATE
+    let board = Array(9).fill("");
+    let curLvl = parseInt(localStorage.getItem('cur_lvl')) || 1;
+    let active = true;
+    const cells = document.querySelectorAll('.cell');
+
+    // INITIALIZE DROPDOWN
+    const selectEl = document.getElementById('levelSelect');
+    const groups = {
+        easy: document.createElement('optgroup'),
+        normal: document.createElement('optgroup'),
+        difficult: document.createElement('optgroup'),
+        impossible: document.createElement('optgroup')
+    };
+    
+    groups.easy.label = "EASY (Levels 1-30)";
+    groups.normal.label = "NORMAL (Levels 31-60)";
+    groups.difficult.label = "DIFFICULT (Levels 61-89)";
+    groups.impossible.label = "IMPOSSIBLE (Levels 90-100)";
+
+    selectEl.appendChild(groups.easy);
+    selectEl.appendChild(groups.normal);
+    selectEl.appendChild(groups.difficult);
+    selectEl.appendChild(groups.impossible);
+
+    for (let i = 1; i <= 100; i++) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.text = `Threat Level ${i}`;
+        if (i <= 30) groups.easy.appendChild(opt);
+        else if (i <= 60) groups.normal.appendChild(opt);
+        else if (i <= 89) groups.difficult.appendChild(opt);
+        else groups.impossible.appendChild(opt);
+    }
+
+    // PAGE NAVIGATION
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // GAME LOGIC
-    let board = Array(9).fill("");
-    // Allow any level to be selected. Load previous level if exists, else start at 1.
-    let curLvl = parseInt(localStorage.getItem('cur_lvl')) || 1;
-    let active = true;
-
-    const cells = document.querySelectorAll('.cell');
-
+    // UPDATE UI (Badge Colors & Status)
     function updateUI() {
-        document.getElementById('levelNum').innerText = curLvl;
-        document.getElementById('status').innerText = `Level ${curLvl}`;
-        // Unlocked navigation for all levels up to 100
-        document.getElementById('prevBtn').disabled = (curLvl <= 1);
-        document.getElementById('nextBtn').disabled = (curLvl >= 100);
+        selectEl.value = curLvl;
         localStorage.setItem('cur_lvl', curLvl);
+        
+        const badge = document.getElementById('diffBadge');
+        let statusText = `System Ready: Level ${curLvl}`;
+
+        if (curLvl <= 30) {
+            badge.innerText = "EASY";
+            badge.style.color = "var(--easy)";
+            badge.style.borderColor = "var(--easy)";
+        } else if (curLvl <= 60) {
+            badge.innerText = "NORMAL";
+            badge.style.color = "var(--normal)";
+            badge.style.borderColor = "var(--normal)";
+        } else if (curLvl <= 89) {
+            badge.innerText = "DIFFICULT";
+            badge.style.color = "var(--difficult)";
+            badge.style.borderColor = "var(--difficult)";
+        } else {
+            badge.innerText = "IMPOSSIBLE";
+            badge.style.color = "var(--impossible)";
+            badge.style.borderColor = "var(--impossible)";
+            statusText = "Warning: Unbeatable Mode Active";
+        }
+
+        document.getElementById('status').innerText = statusText;
     }
     updateUI();
 
-    function changeLevel(d) {
-        if (curLvl + d >= 1 && curLvl + d <= 100) {
-            curLvl += d;
-            resetBoard();
-            updateUI();
-        }
+    // LEVEL CHANGE HANDLER
+    function changeLevel(newLevel) {
+        curLvl = parseInt(newLevel);
+        resetBoard();
+        updateUI();
     }
 
+    // PLAYER MOVE
     function play(i) {
         if (board[i] !== "" || !active) return;
+        
         board[i] = "X";
         cells[i].innerText = "X";
         cells[i].classList.add("x");
+        
         if (checkWin("X")) return;
         
         active = false;
-        setTimeout(cpuPlay, 500);
+        document.getElementById('status').innerText = "AI calculating...";
+        setTimeout(cpuPlay, 600);
     }
 
+    // CPU MOVE LOGIC
     function cpuPlay() {
-        let avail = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-        if (avail.length === 0) return;
-
         let move;
-        // AI Strictness increases as levels increase
-        let aiStrictness = curLvl / 100;
-        
-        if (Math.random() < aiStrictness) {
-            move = getBestMove(); 
+        let avail = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+
+        // IMPOSSIBLE (90-100): Minimax Perfect Play
+        if (curLvl >= 90) {
+            move = getBestMoveMinimax();
         } else {
-            // Random move if AI "fails" the strictness check
-            move = avail[Math.floor(Math.random() * avail.length)];
+            // LEVELS 1-89: Dynamic strictness based on level
+            let aiStrictness = curLvl / 90; // Caps at ~98% strictness at level 89
+            
+            if (Math.random() < aiStrictness) {
+                move = findWinningMove("O") || findWinningMove("X");
+                if (move === undefined || move === -1) {
+                    move = avail[Math.floor(Math.random() * avail.length)];
+                }
+            } else {
+                move = avail[Math.floor(Math.random() * avail.length)];
+            }
         }
 
-        // Failsafe in case getBestMove returns undefined (board full)
-        if (move === undefined) move = avail[0];
-
-        board[move] = "O";
-        cells[move].innerText = "O";
-        cells[move].classList.add("o");
+        if (move !== undefined) {
+            board[move] = "O";
+            cells[move].innerText = "O";
+            cells[move].classList.add("o");
+        }
         
-        if (!checkWin("O")) active = true;
+        if (!checkWin("O")) {
+            active = true;
+            document.getElementById('status').innerText = "Your turn.";
+        }
+    }
+
+    // MINIMAX ALGORITHM
+    function getBestMoveMinimax() {
+        let bestScore = -Infinity;
+        let move;
+        for (let i = 0; i < 9; i++) {
+            if (board[i] === "") {
+                board[i] = "O";
+                let score = minimax(board, 0, false);
+                board[i] = "";
+                if (score > bestScore) {
+                    bestScore = score;
+                    move = i;
+                }
+            }
+        }
+        return move;
+    }
+
+    function minimax(tempBoard, depth, isMaximizing) {
+        if (checkTerminalWin("O")) return 10 - depth;
+        if (checkTerminalWin("X")) return depth - 10;
+        if (!tempBoard.includes("")) return 0;
+
+        if (isMaximizing) {
+            let bestScore = -Infinity;
+            for (let i = 0; i < 9; i++) {
+                if (tempBoard[i] === "") {
+                    tempBoard[i] = "O";
+                    bestScore = Math.max(minimax(tempBoard, depth + 1, false), bestScore);
+                    tempBoard[i] = "";
+                }
+            }
+            return bestScore;
+        } else {
+            let bestScore = Infinity;
+            for (let i = 0; i < 9; i++) {
+                if (tempBoard[i] === "") {
+                    tempBoard[i] = "X";
+                    bestScore = Math.min(minimax(tempBoard, depth + 1, true), bestScore);
+                    tempBoard[i] = "";
+                }
+            }
+            return bestScore;
+        }
+    }
+
+    function checkTerminalWin(p) {
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        return wins.some(a => a.every(i => board[i] === p));
+    }
+
+    function findWinningMove(player) {
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        for (let combo of wins) {
+            let count = 0, empty = -1;
+            for (let i of combo) {
+                if (board[i] === player) count++;
+                else if (board[i] === "") empty = i;
+            }
+            if (count === 2 && empty !== -1) return empty;
+        }
+        return -1;
     }
 
     function checkWin(p) {
-        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-        let match = wins.find(a => a.every(i => board[i] === p));
-        
-        if (match) {
-            if (p === "X") {
-                alert("Level Clear!");
-                // Auto-progress to next level on win
-                if (curLvl < 100) {
-                    curLvl++;
-                }
+        if (checkTerminalWin(p)) {
+            document.getElementById('status').innerText = p === "X" ? "LEVEL CLEAR!" : "AI DOMINANCE ESTABLISHED.";
+            active = false;
+            
+            // Auto-progress level if player wins
+            if (p === "X" && curLvl < 100) { 
+                curLvl++; 
+                setTimeout(() => { resetBoard(); updateUI(); }, 1500);
             } else {
-                alert("AI Wins! Try again.");
+                setTimeout(() => { resetBoard(); updateUI(); }, 1500);
             }
-            resetBoard();
-            updateUI();
             return true;
         }
-        if (!board.includes("")) { 
-            alert("Draw!"); 
-            resetBoard(); 
-            return true; 
+        if (!board.includes("")) {
+            document.getElementById('status').innerText = "DRAW DETECTED.";
+            active = false;
+            setTimeout(() => { resetBoard(); updateUI(); }, 1500);
+            return true;
         }
         return false;
     }
@@ -204,47 +452,8 @@
     function resetBoard() {
         board = Array(9).fill("");
         active = true;
-        cells.forEach(c => { c.innerText = ""; c.className = "cell"; c.classList.remove("x", "o"); });
-    }
-
-    // Advanced, slightly unpredictable logic that scales in difficulty
-    function getBestMove() {
-        // 1. Check if AI can win
-        let winMove = findWinningMove("O");
-        if (winMove !== -1) return winMove;
-        
-        // 2. Check if AI needs to block the player
-        let blockMove = findWinningMove("X");
-        if (blockMove !== -1) return blockMove;
-
-        // 3. Take the center if available
-        if (board[4] === "") return 4;
-
-        // 4. Take a random available corner (adds unpredictability)
-        let corners = [0, 2, 6, 8].filter(i => board[i] === "");
-        if (corners.length > 0) return corners[Math.floor(Math.random() * corners.length)];
-
-        // 5. Take a random available edge
-        let edges = [1, 3, 5, 7].filter(i => board[i] === "");
-        if (edges.length > 0) return edges[Math.floor(Math.random() * edges.length)];
-    }
-
-    // Helper function to detect immediate wins/blocks
-    function findWinningMove(player) {
-        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-        for (let combo of wins) {
-            let count = 0;
-            let emptySquare = -1;
-            for (let i of combo) {
-                if (board[i] === player) count++;
-                else if (board[i] === "") emptySquare = i;
-            }
-            // If two are filled by the same player and one is empty, it's a win/block opportunity
-            if (count === 2 && emptySquare !== -1) return emptySquare;
-        }
-        return -1;
+        cells.forEach(c => { c.innerText = ""; c.className = "cell"; });
     }
 </script>
-
 </body>
 </html>
